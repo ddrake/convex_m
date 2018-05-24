@@ -1,13 +1,14 @@
+% Problem 5a - Logistic Regression with Gradient Method
 clear()
 tmp = load("LogisticData.txt");
-m = size(tmp)(2);
+m = size(tmp,2);
 xx = [tmp(1,:).',ones(m,1)];
 y = tmp(2,:).';
 
 max_gradf = 1.0e-4;
 x0 = [1;1];
 t = 0.01;
-n = 10000
+n = 5000;
 fs = zeros(n,1);
 xk = x0;
 
@@ -22,3 +23,6 @@ for i=1:n
   fs(i)=fk;
 end
 fs = fs(1:i-1);
+optimizer = xk
+steps_to_converge = i-1
+

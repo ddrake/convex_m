@@ -1,13 +1,14 @@
+% Problem 5b - Logistic Regression with Nesterov's Method
 clear()
 tmp = load("LogisticData.txt");
-m = size(tmp)(2);
+m = size(tmp,2);
 xx = [tmp(1,:).',ones(m,1)];
 y = tmp(2,:).';
 
 max_gradf = 1.0e-4;
 x0 = [1;1];
 t = 0.01;
-n = 1000
+n = 1000;
 fs = zeros(n,1);
 xk = x0;
 yk = xk;
@@ -29,3 +30,5 @@ for i=1:n
   xk = xk1;
 end
 fs = fs(1:i-1);
+optimizer = xk
+steps_to_converge = i-1

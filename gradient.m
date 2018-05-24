@@ -17,4 +17,4 @@ for i=1:100
   fk = xk.'*A*xk + b.'*xk;
   fs(i)=fk;
 end
-
+fs = fs(1:i-1);

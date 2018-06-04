@@ -45,7 +45,7 @@ for j = -3:3
   x1norm = ns(iters);
   sqerrs(j+4) = sqerr;
   xns(j+4) = nx1;
-  input("press a key")
+  input('Press any key')
 end
 plot(sqerrs, xns)
 title("Lasso Problem")

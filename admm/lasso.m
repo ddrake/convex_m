@@ -1,27 +1,31 @@
 % The lambda parameter allows us to trade off Ax-b error against the size of x
 % if lambda is small, the error should be smaller but x will be bigger.
-clear()
-newmat = true;
+clear
+newmat = false;
 % for this implementation to make sense
 % we need a tall thin matrix.
-m = 2000;
-n = 50;
 if newmat
+  m = 2000;
+  n = 50;
   A = rand(m,n);
   b = rand(m,1);
   save('LA.mat','A')
   save('Lb.mat','b')
 else
-  load('LA.mat')
-  load('Lb.mat')
+%  load('LA.mat')
+%  load('Lb.mat')
+  load("subgradientA.mat");
+  load("subgradientB.mat");
+  [m,n] = size(A);
 end
 rho = 1000;
 % note: I think we could decrease rho as lambda is increased and still
 % get good convergence.
 xns = zeros(6,1);
 sqerrs = zeros(6,1);
-for j = -3:3
-  lambda = 2^j
+%for j = -3:3
+for j = 1:1
+  lambda = 10
   z = zeros(n,1);
   u = zeros(n,1);
   % x = A\B solves Ax = B
@@ -31,6 +35,7 @@ for j = -3:3
   xp = zeros(n,1);
   iters=500;
   ns = zeros(iters,1);
+  fs = zeros(iters,1);
   % note that we must solve a system each step.
   for i = 1:iters
     x = AtArI\(Atb + rho*(z - u));
@@ -38,6 +43,7 @@ for j = -3:3
     u = u + x - z;
     nx1 = norm(x,1);
     ns(i) = nx1;
+    fs(i) = .5*norm(A*x - b,2)^2 + lambda * norm(x,1);
   end
   plot(ns)
   title("Convergence of norm x")
@@ -46,8 +52,7 @@ for j = -3:3
   sqerrs(j+4) = sqerr;
   xns(j+4) = nx1;
   input('Press any key')
-end
-plot(sqerrs, xns)
-title("Lasso Problem")
-xlabel("1/2||Ax - b||^2")
-ylabel("||x||_1")
+%plot(sqerrs, xns)
+%title("Lasso Problem")
+%xlabel("1/2||Ax - b||^2")
+%ylabel("||x||_1")

@@ -51,9 +51,7 @@ for j = 1:1
   x1norm = ns(iters);
   sqerrs(j+4) = sqerr;
   xns(j+4) = nx1;
-  %input("press a key")
-end
-plot(fs)
+  input('Press any key')
 %plot(sqerrs, xns)
 %title("Lasso Problem")
 %xlabel("1/2||Ax - b||^2")

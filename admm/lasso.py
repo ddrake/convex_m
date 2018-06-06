@@ -1,13 +1,14 @@
 #! /usr/bin/python3
-from numpy import array, zeros, mean, eye, squeeze
+from numpy import array, zeros, mean, eye, squeeze, newaxis
 from numpy.random import rand
-from scipy.linalg import cho_factor, cho_solve
-from mat_util import load, save
+from scipy.linalg import cho_factor, cho_solve, norm, solve
+from mat_util import load, save, save_text
+from matplotlib import pyplot as plt
 
 def shrinkage(a, k):
     return (abs(a-k)-abs(a+k))/2 + a
 
-newmat = True;
+newmat = False;
 # for this implementation to make sense
 # we need a tall thin matrix.
 if newmat:
@@ -17,46 +18,35 @@ if newmat:
     b = rand(m,1)
     save('A',A)
     save('b',b)
+    save_text('A',A)
+    save_text('b',b)
 else:
     A = load('A')
     b = load('b')
-    m,n = a.shape
- 
-p = 50
-lam = 1
+    m,n = A.shape
+    print("m = {}, n = {}".format(m,n))
+
+lam = 10
 rho = 100  # The timestep
 
-# split the original matrix and store cholesky-factored (Ai'*Ai + rho*I)
-# matrices as well as b and u vectors for use by the p processes.
-# todo: pre-process the original matrix so that each process
-#   just needs to load its own data from disk
-alst = []
-rlst = []
-blst = []
-for i in range(p):
-    l = m//p
-    Ai = A[i*l:(i+1)*l,:]
-    alst.append(Ai)
-    rlst.append(cho_factor(Ai.T.dot(Ai) + rho*eye(n)))
-    blst.append(b[i*l:(i+1)*l])
-  
-xs = zeros((n,p));
-us = zeros((n,p));
-curz = zeros(n);
+r=cho_factor(A.T.dot(A) + rho*eye(n))
+# store cholesky-factored (A'*A + rho*I)
+ 
+x = zeros(n)
+u = zeros(n)
+curz = zeros(n)
+Atari = A.T.dot(A) + rho*eye(n)
 
 # Main algorithm
 iters=500;
-ns = zeros((iters,1));
+fs = zeros(iters)
 for i in range(iters):
-    for j in range(p):
-        z = curz
-        u = us[:,j]
-        r = rlst[j]
-        b = blst[j]
-        a = alst[j]
-        x = cho_solve(r, squeeze(a.T.dot(b)) + rho*(z-u))
-        xs[:,j]=x # insert the x vector processed
+    x = solve(Atari, A.T.dot(b) + rho*(curz-u))
+    #x = cho_solve(r, A.T.dot(b) + rho*(curz-u))
+    curz = shrinkage(x + u,lam/rho)
+    u = u + x - curz
+    fs[i] = 0.5*norm(A.dot(x) - b)**2 + lam * norm(x,1)
 
-    curz = shrinkage(mean(xs,1) + mean(us,1),lam/rho)
-    us = (us + xs) - curz[:,newaxis]
+plt.plot(fs)
+plt.show()
 

@@ -2,6 +2,7 @@
 % if lambda is small, the error should be smaller but x will be bigger.
 clear
 newmat = false;
+load_text = true;
 % for this implementation to make sense
 % we need a tall thin matrix.
 if newmat
@@ -12,13 +13,16 @@ if newmat
   save('LA.mat','A')
   save('Lb.mat','b')
 else
-%  load('LA.mat')
-%  load('Lb.mat')
-  load("subgradientA.mat");
-  load("subgradientB.mat");
+  if load_text
+    A = load('A.txt');
+    b = load('b.txt');
+  else
+    load('LA.mat');
+    load('Lb.mat');
+  end
   [m,n] = size(A);
 end
-rho = 1000;
+rho = 100;
 % note: I think we could decrease rho as lambda is increased and still
 % get good convergence.
 xns = zeros(6,1);
@@ -43,7 +47,7 @@ for j = 1:1
     u = u + x - z;
     nx1 = norm(x,1);
     ns(i) = nx1;
-    fs(i) = .5*norm(A*x - b,2)^2 + lambda * norm(x,1);
+    fs(i) = .5*norm(A*x - b,2)^2 + lambda * nx1;
   end
   plot(ns)
   title("Convergence of norm x")
@@ -51,8 +55,9 @@ for j = 1:1
   x1norm = ns(iters);
   sqerrs(j+4) = sqerr;
   xns(j+4) = nx1;
-  input('Press any key')
-%plot(sqerrs, xns)
-%title("Lasso Problem")
-%xlabel("1/2||Ax - b||^2")
-%ylabel("||x||_1")
+  %input('Press any key')
+  %plot(sqerrs, xns)
+  %title("Lasso Problem")
+  %xlabel("1/2||Ax - b||^2")
+  %ylabel("||x||_1")
+end

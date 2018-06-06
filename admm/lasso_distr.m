@@ -86,8 +86,8 @@ function [status] = lasso_distr()
         received(source) = 1;
       end
       % I have all the xs for this step now - I will compute z and u  
-      z = shrinkage(mean(xs,2) + mean(us,2),lambda/rho);
-      us = us + xs - z;
+      curz = shrinkage(mean(xs,2) + mean(us,2),lambda/rho);
+      us = us + xs - curz;
     else % I am one of the processor guys
       received = false;
       while not(received)

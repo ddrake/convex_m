@@ -1,3 +1,5 @@
 *.mat
 *.pdf
+*.pickle
 html
+__pycache__

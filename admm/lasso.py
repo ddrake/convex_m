@@ -1,8 +1,11 @@
 #! /usr/bin/python3
-from numpy import array, zeros, mean, eye
+from numpy import array, zeros, mean, eye, squeeze
 from numpy.random import rand
 from scipy.linalg import cho_factor, cho_solve
 from mat_util import load, save
+
+def shrinkage(a, k):
+    return (abs(a-k)-abs(a+k))/2 + a
 
 newmat = True;
 # for this implementation to make sense
@@ -39,24 +42,21 @@ for i in range(p):
   
 xs = zeros((n,p));
 us = zeros((n,p));
-curz = zeros((n,1));
+curz = zeros(n);
 
 # Main algorithm
 iters=500;
 ns = zeros((iters,1));
 for i in range(iters):
-    for j in range(1,p+1):
+    for j in range(p):
         z = curz
         u = us[:,j]
         r = rlst[j]
         b = blst[j]
         a = alst[j]
-        x = cho_solve(r, a.T.dot(b) + rho*(z-u))
+        x = cho_solve(r, squeeze(a.T.dot(b)) + rho*(z-u))
         xs[:,j]=x # insert the x vector processed
 
-    curz = shrinkage(mean(xs,2) + mean(us,2),lam/rho)
-    us += xs - curz
-
-def shrinkage(a, k):
-    return (abs(a-k)-abs(a+k))/2 + a
+    curz = shrinkage(mean(xs,1) + mean(us,1),lam/rho)
+    us = (us + xs) - curz[:,newaxis]
 

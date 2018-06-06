@@ -3,11 +3,12 @@ from numpy import array, zeros, mean, eye, squeeze, newaxis
 from numpy.random import rand
 from scipy.linalg import cho_factor, cho_solve, norm
 from mat_util import load, save, save_text
+from matplotlib import pyplot as plt
 
 def shrinkage(a, k):
     return (abs(a-k)-abs(a+k))/2 + a
 
-newmat = True;
+newmat = False;
 # for this implementation to make sense
 # we need a tall thin matrix.
 if newmat:
@@ -26,7 +27,7 @@ else:
     print("m = {}, n = {}".format(m,n))
 
 p = 50
-lam = 1
+lam = 10
 rho = 100  # The timestep
 
 # split the original matrix and store cholesky-factored (Ai'*Ai + rho*I)
@@ -48,9 +49,11 @@ us = zeros((n,p))
 curz = zeros(n)
 
 # Main algorithm
-iters=500;
+iters=500
 fs = zeros(iters)
+nxs = zeros(iters)
 for i in range(iters):
+    print("i = {}".format(i))
     for j in range(p):
         zj = curz
         uj = us[:,j]
@@ -62,7 +65,11 @@ for i in range(iters):
 
     xm = mean(xs,1)
     um = mean(us,1)
-    curz = shrinkage(xm + um,lam/rho)
+    curz = shrinkage(xm + um,lam/rho/p)
     us = (us + xs) - curz[:,newaxis]
-    fs[i] = 0.5*norm(A.dot(xm) - b)**2 + lam * norm(xm,1)
+    nx1 = norm(xm,1)
+    fs[i] = 0.5*norm(A.dot(xm) - squeeze(b),2)**2 + lam * norm(xm,1)
+    nxs[i] = nx1
 
+plt.plot(fs)
+plt.show()

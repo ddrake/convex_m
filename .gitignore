@@ -3,3 +3,4 @@
 *.pickle
 html
 __pycache__
+*.swp

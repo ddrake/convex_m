@@ -38,15 +38,17 @@ curz = zeros(n)
 Atari = A.T.dot(A) + rho*eye(n)
 
 # Main algorithm
-iters=500;
+iters=500
 fs = zeros(iters)
+nxs = zeros(iters)
 for i in range(iters):
-    x = solve(Atari, A.T.dot(b) + rho*(curz-u))
-    #x = cho_solve(r, A.T.dot(b) + rho*(curz-u))
+    #x = solve(Atari, squeeze(A.T.dot(b)) + rho*(curz-u))
+    x = cho_solve(r, squeeze(A.T.dot(b)) + rho*(curz-u))
     curz = shrinkage(x + u,lam/rho)
     u = u + x - curz
-    fs[i] = 0.5*norm(A.dot(x) - b)**2 + lam * norm(x,1)
-
+    nx1 = norm(x,1)
+    fs[i] = 0.5*norm(A.dot(x) - squeeze(b))**2 + lam * nx1
+    nxs[i] = nx1
 plt.plot(fs)
 plt.show()
 

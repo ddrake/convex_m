@@ -1,12 +1,14 @@
 import pickle
 from numpy import *
 
-def load(name):
-    with open(name + '.pickle','rb') as f:
+def load(name, directory=None):
+    path = directory + '/' + name if directory else name
+    with open(path + '.pickle','rb') as f:
         return pickle.load(f)
 
-def save(name, object):
-    with open(name + '.pickle','wb') as f:
+def save(name, object, directory=None):
+    path = directory + '/' + name if directory else name
+    with open(path + '.pickle','wb') as f:
         pickle.dump(object, f)
 
 def save_text(name, object):

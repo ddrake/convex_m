@@ -26,9 +26,9 @@ else:
     m,n = A.shape
     print("m = {}, n = {}".format(m,n))
 
-p = 50
-lam = 10
-rho = 100  # The timestep
+p = 50      # the number of pieces (helper processes)
+lam = 10    # the weight on 1-norm of x
+rho = 100  
 
 # split the original matrix and store cholesky-factored (Ai'*Ai + rho*I)
 # matrices as well as b and u vectors for use by the p processes.

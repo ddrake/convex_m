@@ -9,6 +9,8 @@ def shrinkage(a, k):
     return (abs(a-k)-abs(a+k))/2 + a
 
 newmat = False;
+use_cholesky = True # Helper processes perform Cholesky factorization
+datadir = 'data'
 # for this implementation to make sense
 # we need a tall thin matrix.
 if newmat:
@@ -16,13 +18,13 @@ if newmat:
     n = 15
     A = rand(m,n)
     b = rand(m,1)
-    save('A',A)
-    save('b',b)
-    save_text('A',A)
-    save_text('b',b)
+    save('A',A,datadir)
+    save('b',b,datadir)
+    save_text('A',A,datadir)
+    save_text('b',b,datadir)
 else:
-    A = load('A')
-    b = load('b')
+    A = load('A',datadir)
+    b = load('b',datadir)
     m,n = A.shape
     print("m = {}, n = {}".format(m,n))
 
@@ -49,17 +51,20 @@ us = zeros((n,p))
 curz = zeros(n)
 
 # Main algorithm
-iters=500
+iters=50
 fs = zeros(iters)
 nxs = zeros(iters)
 for i in range(iters):
-    print("i = {}".format(i))
     for j in range(p):
         zj = curz
         uj = us[:,j]
         rj = rlst[j]
         bj = blst[j]
         aj = alst[j]
+        if use_cholesky:
+            r = cho_factor(A.T.dot(A) + rho*eye(n))
+        else:
+            r = A.T.dot(A) + rho*eye(n)
         xj = cho_solve(rj, squeeze(aj.T.dot(bj)) + rho*(zj-uj))
         xs[:,j]=xj # insert the x vector processed
 
